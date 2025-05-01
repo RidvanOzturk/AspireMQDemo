@@ -1,0 +1,6 @@
+@AspireMQDemoWebApi_HostAddress = http://localhost:5043
+
+GET {{AspireMQDemoWebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
