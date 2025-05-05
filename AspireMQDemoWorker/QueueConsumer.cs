@@ -1,8 +1,13 @@
-﻿using RabbitMQ.Client;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using Shared;
 using Shared.Entities;
 using Shared.Models;
+using Shared.Enums;
 using System.Text.Json;
+using System.Text;
 
 namespace AspireMQDemoWorker;
 
@@ -10,6 +15,12 @@ public class QueueConsumer
 {
     public Task StartAsync()
     {
+        var configuration = new ConfigurationManager()
+            .AddJsonFile("appsettings.json", optional: false)
+            .Build();
+
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+
         var factory = new ConnectionFactory
         {
             HostName = "rabbitmq"
@@ -28,14 +39,29 @@ public class QueueConsumer
 
         var consumer = new EventingBasicConsumer(channel);
 
-        consumer.Received += (model, ea) =>
+        consumer.Received += async (model, ea) =>
         {
             var body = ea.Body.ToArray();
             var message = JsonSerializer.Deserialize<QueueMessageModel<Product>>(body);
 
-            if (message is not null)
+            if (message is not null && message.Operation == OperationType.Create)
             {
-                Console.WriteLine($"[Worker] Received message: {message.Operation} - {message.Data.Name} - {message.Data.Price}₺");
+                var optionsBuilder = new DbContextOptionsBuilder<ProductDbContext>();
+                optionsBuilder.UseNpgsql(connectionString);
+
+                using var dbContext = new ProductDbContext(optionsBuilder.Options);
+
+                var product = new Product
+                {
+                    Id = message.Id,
+                    Name = message.Data.Name,
+                    Price = message.Data.Price
+                };
+
+                await dbContext.Products.AddAsync(product);
+                await dbContext.SaveChangesAsync();
+
+                Console.WriteLine($"[Worker] ✅ Saved to DB: {product.Name} - {product.Price}₺");
             }
         };
 
