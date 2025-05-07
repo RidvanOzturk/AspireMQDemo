@@ -1,3 +1,5 @@
+using AspireMQDemoWebApi.Services.Contracts;
+using AspireMQDemoWebApi.Services.Implementations;
 using Microsoft.EntityFrameworkCore;
 using Shared;
 
@@ -6,7 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ProductDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
         b => b.MigrationsAssembly("AspireMQDemoWebApi")));
+
 // Add services to the container.
+
+builder.Services.AddScoped<IProductService, ProductService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

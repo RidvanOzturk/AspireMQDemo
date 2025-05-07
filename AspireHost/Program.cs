@@ -10,12 +10,11 @@ var rabbitMq = builder.AddContainer("rabbitmq", "rabbitmq:3-management")
     .WithEndpoint(name: "amqp", port: 5672, targetPort: 5672)
     .WithEndpoint(name: "ui", port: 15672, targetPort: 15672);
 
-// Web API
 builder.AddProject<Projects.AspireMQDemoWebApi>("AspireMQDemoWebApi")
-    .WithEnvironment("RabbitMQ__Host", "rabbitmq");
+    .WithEnvironment("RabbitMQ__Host", "rabbitmq"); // sadece environment yeterli
 
-// Worker
 builder.AddProject<Projects.AspireMQDemoWorker>("AspireMQDemoWorker")
     .WithEnvironment("RabbitMQ__Host", "rabbitmq");
+
 
 builder.Build().Run();

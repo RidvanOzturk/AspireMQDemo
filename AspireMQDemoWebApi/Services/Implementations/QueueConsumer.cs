@@ -18,9 +18,11 @@ public class QueueConsumer(IServiceProvider serviceProvider, IConfiguration conf
 
     private void InitializeRabbitMQ()
     {
+        var rabbitHost = configuration["RabbitMQ:Host"] ?? "rabbitmq";
+
         var factory = new ConnectionFactory
         {
-            HostName = configuration["RabbitMQ:Host"] ?? "localhost"
+            HostName = rabbitHost
         };
 
         connection = factory.CreateConnection();
