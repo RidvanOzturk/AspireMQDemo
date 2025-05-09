@@ -10,6 +10,13 @@ namespace AspireMQDemoWebApi.Controllers;
 [Route("api/[controller]")]
 public class ProductsController(IQueuePublisher queuePublisher, IProductService productService) : ControllerBase
 {
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var products = await productService.GetAllAsync();
+        return Ok(products);
+    }
+
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] Product product)
     {
@@ -28,11 +35,12 @@ public class ProductsController(IQueuePublisher queuePublisher, IProductService 
         return Ok(new { id, message = "Product is queued for creation." });
     }
 
-   [HttpGet]
-    public async Task<IActionResult> GetAll()
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
     {
-        var products = await productService.GetAllAsync();
-        return Ok(products);
+        await productService.DeleteAsync(id);
+        return Ok();
+
     }
 
     [HttpGet("{id}")]
