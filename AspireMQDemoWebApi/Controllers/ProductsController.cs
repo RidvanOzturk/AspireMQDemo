@@ -45,8 +45,8 @@ public class ProductsController(IQueuePublisher queuePublisher, IProductService 
         }
         updatedProduct.Id = id;
         var success = await productService.UpdateAsync(updatedProduct);
-        if (!success) 
-        { 
+        if (!success)
+        {
             return BadRequest();
         }
 

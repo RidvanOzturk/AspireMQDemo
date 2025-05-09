@@ -1,6 +1,4 @@
 ﻿using Dapper;
-using Microsoft.Extensions.Configuration;
-
 using Npgsql;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
