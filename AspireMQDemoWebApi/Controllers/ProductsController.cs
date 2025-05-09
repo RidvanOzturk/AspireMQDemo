@@ -35,6 +35,24 @@ public class ProductsController(IQueuePublisher queuePublisher, IProductService 
         return Ok(new { id, message = "Product is queued for creation." });
     }
 
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(Guid id, [FromBody] Product updatedProduct)
+    {
+        var existing = await productService.GetByIdAsync(id);
+        if (existing == null)
+        {
+            return NotFound();
+        }
+        updatedProduct.Id = id;
+        var success = await productService.UpdateAsync(updatedProduct);
+        if (!success) 
+        { 
+            return BadRequest();
+        }
+
+        return Ok();
+    }
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
