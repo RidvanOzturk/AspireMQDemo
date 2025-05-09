@@ -5,6 +5,12 @@
     },
     "Container (Dockerfile)": {
       "commandName": "Docker"
+    },
+    "ConsoleApp1": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
     }
   }
 }

@@ -1,3 +1,4 @@
+using AspireMQDemoWebApi.Services;
 using AspireMQDemoWebApi.Services.Contracts;
 using AspireMQDemoWebApi.Services.Implementations;
 using Microsoft.EntityFrameworkCore;
@@ -9,8 +10,8 @@ builder.Services.AddDbContext<ProductDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
         b => b.MigrationsAssembly("AspireMQDemoWebApi")));
 
-// Add services to the container.
-
+// Check lifetime of this queue publisher
+builder.Services.AddSingleton<IQueuePublisher, QueuePublisher>();
 builder.Services.AddScoped<IProductService, ProductService>();
 
 builder.Services.AddControllers();

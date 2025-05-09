@@ -1,28 +1,26 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Shared.Models;
-using Shared.Enums;
-using AspireMQDemoWebApi.Models;
-using AspireMQDemoWebApi.Services.Contracts;
-using AspireMQDemoWebApi.Services.Implementations;
+﻿using AspireMQDemoWebApi.Services.Contracts;
+using Microsoft.AspNetCore.Mvc;
 using Shared.Entities;
+using Shared.Enums;
+using Shared.Models;
 
 namespace AspireMQDemoWebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProductController(IQueuePublisher queuePublisher, IProductService productService) : ControllerBase
+public class ProductsController(IQueuePublisher queuePublisher, IProductService productService) : ControllerBase
 {
-    // POST /api/products
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] Product product)
     {
         var id = Guid.NewGuid();
 
-        var message = new QueueMessageModel<Product>
+        var message = new QueueMessageModel
         {
             Id = id,
-            Operation = OperationType.Create,
-            Data = product
+            Name = product.Name,
+            Price = product.Price,
+            Operation = OperationType.Create
         };
 
         await queuePublisher.PublishAsync(message);

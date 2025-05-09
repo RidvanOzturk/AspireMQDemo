@@ -3,18 +3,10 @@ using Aspire.Hosting.ApplicationModel;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-// RabbitMQ container
-var rabbitMq = builder.AddContainer("rabbitmq", "rabbitmq:3-management")
-    .WithEnvironment("RABBITMQ_DEFAULT_USER", "guest")
-    .WithEnvironment("RABBITMQ_DEFAULT_PASS", "guest")
-    .WithEndpoint(name: "amqp", port: 5672, targetPort: 5672)
-    .WithEndpoint(name: "ui", port: 15672, targetPort: 15672);
 
-builder.AddProject<Projects.AspireMQDemoWebApi>("AspireMQDemoWebApi")
-    .WithEnvironment("RabbitMQ__Host", "rabbitmq"); // sadece environment yeterli
+builder.AddProject<Projects.AspireMQDemoWebApi>("AspireMQDemoWebApi");
 
-builder.AddProject<Projects.AspireMQDemoWorker>("AspireMQDemoWorker")
-    .WithEnvironment("RabbitMQ__Host", "rabbitmq");
+builder.AddProject<Projects.AspireMQDemoWorker>("AspireMQDemoWorker");
 
 
 builder.Build().Run();

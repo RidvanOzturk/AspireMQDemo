@@ -1,24 +1,24 @@
-﻿using System.Text;
-using System.Text.Json;
-using AspireMQDemoWebApi.Services.Contracts;
+﻿using AspireMQDemoWebApi.Services.Contracts;
 using RabbitMQ.Client;
 using Shared.Models;
+using System.Text;
+using System.Text.Json;
 
-namespace AspireMQDemoWebApi.Services.Implementations;
-//ASK
-public class QueuePublisher(IConfiguration configuration) : IQueuePublisher
+namespace AspireMQDemoWebApi.Services;
+
+public class QueuePublisher : IQueuePublisher
 {
-    public Task PublishAsync<T>(QueueMessageModel<T> message)
+    public async Task PublishAsync(QueueMessageModel message)
     {
         var factory = new ConnectionFactory
         {
-            HostName = configuration["RabbitMQ:Host"] ?? "localhost"
+            HostName = "localhost"
         };
 
-        using var connection = factory.CreateConnection(); 
-        using var channel = connection.CreateModel();
+        await using var connection = await factory.CreateConnectionAsync();
+        using var channel = await connection.CreateChannelAsync();
 
-        channel.QueueDeclare(
+        await channel.QueueDeclareAsync(
             queue: "product-queue",
             durable: false,
             exclusive: false,
@@ -26,9 +26,13 @@ public class QueuePublisher(IConfiguration configuration) : IQueuePublisher
             arguments: null
         );
 
-        var body = JsonSerializer.SerializeToUtf8Bytes(message);
-        channel.BasicPublish(exchange: "", routingKey: "product-queue", basicProperties: null, body: body);
+        var payload = JsonSerializer.Serialize(message);
+        var body = Encoding.UTF8.GetBytes(payload);
 
-        return Task.CompletedTask;
+        await channel.BasicPublishAsync(
+            exchange: string.Empty,
+            routingKey: "product-queue",
+            body: body
+        );
     }
 }
