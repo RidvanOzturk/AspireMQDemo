@@ -14,6 +14,10 @@ public class ProductsController(IQueuePublisher queuePublisher, IProductService 
     public async Task<IActionResult> GetAll()
     {
         var products = await productService.GetAllAsync();
+        if (products is null)
+        {
+            return BadRequest();
+        }
         return Ok(products);
     }
 
@@ -39,7 +43,7 @@ public class ProductsController(IQueuePublisher queuePublisher, IProductService 
     public async Task<IActionResult> Update(Guid id, [FromBody] Product updatedProduct)
     {
         var existing = await productService.GetByIdAsync(id);
-        if (existing == null)
+        if (existing is null)
         {
             return NotFound();
         }
@@ -65,8 +69,10 @@ public class ProductsController(IQueuePublisher queuePublisher, IProductService 
     public async Task<IActionResult> GetById(Guid id)
     {
         var product = await productService.GetByIdAsync(id);
-        if (product == null)
+        if (product is null)
+        {
             return NotFound();
+        }
 
         return Ok(product);
     }
